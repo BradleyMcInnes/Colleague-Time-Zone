@@ -1,0 +1,8 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "xteXmT8MejNY0hnSmTX_l"
+uri = "file://artifacts/timezone-tool/README.md"
+type = "text"
+title = "README.md — Time Zone Overlap"
