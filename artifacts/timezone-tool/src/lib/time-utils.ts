@@ -101,8 +101,14 @@ export function formatInTimeZone(
     options.minute = '2-digit';
     options.hour12 = true;
   } else if (format === 'hour') {
+    // Always include minutes so half-hour-offset timezones (e.g. Mumbai UTC+5:30,
+    // Kathmandu UTC+5:45) display correctly — e.g. "4:30 AM" instead of "4 AM".
+    // Strip ":00" for whole-hour timezones to keep the display tidy.
     options.hour = 'numeric';
+    options.minute = '2-digit';
     options.hour12 = true;
+    const result = new Intl.DateTimeFormat('en-US', options).format(date);
+    return result.replace(':00', '');
   } else if (format === 'weekday') {
     options.weekday = 'short';
   } else if (format === 'full') {
