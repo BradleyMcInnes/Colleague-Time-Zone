@@ -1,5 +1,5 @@
 import * as React from "react"
-import { X, User, Globe } from "lucide-react"
+import { X, User, Globe, GripVertical } from "lucide-react"
 import { motion } from "framer-motion"
 
 import { City } from "@/lib/cities"
@@ -18,24 +18,60 @@ interface PersonCardProps {
   isMe: boolean;
   onUpdate: (updates: Partial<Person>) => void;
   onRemove?: () => void;
+  draggable?: boolean;
+  isDragging?: boolean;
+  isDragOver?: boolean;
+  onDragStart?: () => void;
+  onDragOver?: (e: React.DragEvent) => void;
+  onDrop?: () => void;
+  onDragEnd?: () => void;
 }
 
-export function PersonCard({ person, isMe, onUpdate, onRemove }: PersonCardProps) {
+export function PersonCard({
+  person,
+  isMe,
+  onUpdate,
+  onRemove,
+  draggable,
+  isDragging,
+  isDragOver,
+  onDragStart,
+  onDragOver,
+  onDrop,
+  onDragEnd,
+}: PersonCardProps) {
   return (
     <motion.div
       layout
       initial={{ opacity: 0, y: 10, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, scale: 0.9, transition: { duration: 0.2 } }}
-      className="relative flex flex-col gap-4 p-5 rounded-2xl glass-card group hover:shadow-lg transition-shadow duration-300"
+      draggable={draggable}
+      onDragStart={onDragStart}
+      onDragOver={onDragOver}
+      onDrop={onDrop}
+      onDragEnd={onDragEnd}
+      className={[
+        "relative flex flex-col gap-4 p-5 rounded-2xl glass-card group transition-all duration-200",
+        isDragging ? "opacity-40 scale-95 shadow-none" : "hover:shadow-lg shadow-sm",
+        isDragOver ? "ring-2 ring-primary ring-offset-2 bg-primary/5" : "",
+        draggable ? "cursor-grab active:cursor-grabbing" : "",
+      ].join(" ")}
     >
+      {/* Drag handle — only for colleague cards */}
+      {draggable && (
+        <div className="absolute top-3 left-3 text-slate-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+          <GripVertical className="w-4 h-4" />
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3 w-full pr-6">
+        <div className={`flex items-center gap-3 w-full pr-6 ${draggable ? "pl-4" : ""}`}>
           <div className={`flex items-center justify-center w-10 h-10 rounded-full shrink-0 ${isMe ? 'bg-primary/10 text-primary' : 'bg-slate-100 text-slate-600'}`}>
             {isMe ? <Globe className="w-5 h-5" /> : <User className="w-5 h-5" />}
           </div>
-          
+
           {isMe ? (
             <div className="font-semibold text-lg text-slate-800 tracking-tight">Your Location</div>
           ) : (
@@ -47,11 +83,11 @@ export function PersonCard({ person, isMe, onUpdate, onRemove }: PersonCardProps
             />
           )}
         </div>
-        
+
         {!isMe && onRemove && (
-          <Button 
-            variant="ghost" 
-            size="icon" 
+          <Button
+            variant="ghost"
+            size="icon"
             className="absolute top-4 right-4 h-8 w-8 text-slate-400 hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-opacity"
             onClick={onRemove}
           >
@@ -65,10 +101,10 @@ export function PersonCard({ person, isMe, onUpdate, onRemove }: PersonCardProps
         <label className="text-xs font-medium text-slate-500 ml-1 uppercase tracking-wider">
           Time Zone
         </label>
-        <CityPicker 
-          value={person.city} 
+        <CityPicker
+          value={person.city}
           onChange={(city) => onUpdate({ city })}
-          placeholder="Search city..." 
+          placeholder="Search city..."
         />
       </div>
     </motion.div>

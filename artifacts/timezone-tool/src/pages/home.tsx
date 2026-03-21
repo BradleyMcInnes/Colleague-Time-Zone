@@ -7,7 +7,6 @@ import { cities, getLocalCity } from "@/lib/cities"
 import { Person, PersonCard } from "@/components/person-card"
 import { OverlapTable } from "@/components/overlap-table"
 
-// Default example cities shown on first load so users immediately see the table
 const defaultColleagueCities = [
   cities.find(c => c.name === "London")!,
   cities.find(c => c.name === "Tokyo")!,
@@ -29,7 +28,9 @@ export default function Home() {
 
   const [colleagues, setColleagues] = React.useState<Person[]>(defaultColleagues)
 
-  // Try to replace the default "You" city with the browser's actual timezone
+  const [dragIndex, setDragIndex] = React.useState<number | null>(null)
+  const [dragOverIndex, setDragOverIndex] = React.useState<number | null>(null)
+
   React.useEffect(() => {
     const detectedCity = getLocalCity();
     if (detectedCity) {
@@ -55,9 +56,35 @@ export default function Home() {
     setColleagues(prev => prev.map(c => c.id === id ? { ...c, ...updates } : c));
   }
 
+  const handleDragStart = (index: number) => {
+    setDragIndex(index);
+  }
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (index !== dragOverIndex) setDragOverIndex(index);
+  }
+
+  const handleDrop = (index: number) => {
+    if (dragIndex !== null && dragIndex !== index) {
+      setColleagues(prev => {
+        const next = [...prev];
+        const [item] = next.splice(dragIndex, 1);
+        next.splice(index, 0, item);
+        return next;
+      });
+    }
+    setDragIndex(null);
+    setDragOverIndex(null);
+  }
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+    setDragOverIndex(null);
+  }
+
   return (
     <div className="min-h-screen bg-[#F8FAFC] pb-24 relative overflow-hidden">
-      {/* Decorative blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
       <div className="absolute top-[20%] right-[-5%] w-[30%] h-[50%] bg-blue-400/5 rounded-full blur-[120px] pointer-events-none" />
 
@@ -97,7 +124,12 @@ export default function Home() {
         {/* People cards */}
         <div className="mb-16">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-slate-800">Team Locations</h2>
+            <div>
+              <h2 className="text-xl font-bold text-slate-800">Team Locations</h2>
+              {colleagues.length > 0 && (
+                <p className="text-xs text-slate-400 mt-0.5">Drag colleague cards to reorder columns</p>
+              )}
+            </div>
             <Button
               onClick={addColleague}
               disabled={colleagues.length >= 5}
@@ -109,6 +141,7 @@ export default function Home() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {/* "You" card — never draggable */}
             <PersonCard
               isMe={true}
               person={me}
@@ -116,13 +149,20 @@ export default function Home() {
             />
 
             <AnimatePresence>
-              {colleagues.map((colleague) => (
+              {colleagues.map((colleague, index) => (
                 <PersonCard
                   key={colleague.id}
                   isMe={false}
                   person={colleague}
                   onUpdate={(updates) => updateColleague(colleague.id, updates)}
                   onRemove={() => removeColleague(colleague.id)}
+                  draggable
+                  isDragging={dragIndex === index}
+                  isDragOver={dragOverIndex === index && dragIndex !== index}
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDrop={() => handleDrop(index)}
+                  onDragEnd={handleDragEnd}
                 />
               ))}
             </AnimatePresence>
