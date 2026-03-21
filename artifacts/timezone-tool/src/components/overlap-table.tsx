@@ -52,13 +52,16 @@ export function OverlapTable({ people, baseTimezone }: OverlapTableProps) {
                 Your Day
               </th>
               {activePeople.map((p) => (
-                <th key={p.id} className="p-4 min-w-[140px] text-center">
+                <th key={p.id} className="p-4 min-w-[150px] text-center">
                   <div className="flex flex-col items-center gap-1">
                     <span className="font-semibold text-slate-900 text-base">
                       {p.name}
                     </span>
                     <span className="text-xs text-slate-500 font-medium px-2 py-0.5 bg-slate-100 rounded-full">
                       {p.city.name}
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      {p.city.timezone.replace(/_/g, '\u00A0')}
                     </span>
                     <span className="text-xs font-bold text-primary mt-1 flex items-center gap-1.5 bg-primary/5 px-2 py-1 rounded-md">
                       <Clock className="w-3 h-3" />
