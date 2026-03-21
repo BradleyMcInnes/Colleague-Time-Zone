@@ -1,0 +1,11 @@
+packages:
+  "framer-motion": "For fluid, stunning UI animations and layout transitions"
+  "date-fns": "For robust date formatting and manipulation"
+  "date-fns-tz": "For accurate timezone handling and parsing"
+  "lucide-react": "For beautiful vector icons"
+
+images: []
+
+notes:
+  - This is a frontend-only tool with no backend API requirements.
+  - Using browser-native Intl API combined with date-fns-tz for precise cross-timezone calculations without heavy moment.js payloads.

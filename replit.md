@@ -21,7 +21,8 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ```text
 artifacts-monorepo/
 ├── artifacts/              # Deployable applications
-│   └── api-server/         # Express API server
+│   ├── api-server/         # Express API server
+│   └── timezone-tool/      # Time Zone Overlap web app (React + Vite)
 ├── lib/                    # Shared libraries
 │   ├── api-spec/           # OpenAPI spec + Orval codegen config
 │   ├── api-client-react/   # Generated React Query hooks
@@ -90,6 +91,21 @@ Generated Zod schemas from the OpenAPI spec (e.g. `HealthCheckResponse`). Used b
 ### `lib/api-client-react` (`@workspace/api-client-react`)
 
 Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHealthCheck`, `healthCheck`).
+
+### `artifacts/timezone-tool` (`@workspace/timezone-tool`)
+
+Frontend-only React + Vite web app for visualizing time zone overlaps across a team.
+
+- No backend required — all logic runs in the browser via the `Intl` API
+- Key files:
+  - `src/pages/home.tsx` — main page, manages state for user + colleagues
+  - `src/components/person-card.tsx` — card UI for each person (name + city picker)
+  - `src/components/city-picker.tsx` — searchable combobox using shadcn Command/Popover
+  - `src/components/overlap-table.tsx` — 24-hour grid showing working hours per time zone
+  - `src/lib/cities.ts` — curated list of 110+ cities with IANA timezone mappings
+  - `src/lib/time-utils.ts` — Intl-based helpers for timezone-aware formatting
+- Dependencies: `framer-motion` (animations), `lucide-react` (icons)
+- Preview path: `/`
 
 ### `scripts` (`@workspace/scripts`)
 

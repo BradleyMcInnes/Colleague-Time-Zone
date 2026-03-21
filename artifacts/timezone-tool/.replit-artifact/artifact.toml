@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Time Zone Overlap"
+version = "1.0.0"
+id = "artifacts/timezone-tool"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 19356
+
+[services.development]
+run = "pnpm --filter @workspace/timezone-tool run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/timezone-tool", "run", "build" ]
+publicDir = "artifacts/timezone-tool/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "19356"
+BASE_PATH = "/"
