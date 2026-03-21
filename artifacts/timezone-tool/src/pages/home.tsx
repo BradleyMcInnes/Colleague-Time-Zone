@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Plus, Clock } from "lucide-react"
+import { Plus, Users } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 import { Button } from "@/components/ui/button"
@@ -38,7 +38,7 @@ export default function Home() {
   }, []);
 
   const addColleague = () => {
-    if (colleagues.length >= 7) return;
+    if (colleagues.length >= 5) return;
     const newId = Math.random().toString(36).substring(7);
     setColleagues(prev => [...prev, {
       id: newId,
@@ -56,102 +56,115 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col lg:flex-row h-screen bg-background overflow-hidden text-foreground">
-      {/* Sidebar */}
-      <aside className="w-full lg:w-[340px] border-b lg:border-b-0 lg:border-r border-border bg-card flex flex-col z-20 shadow-xl">
-        {/* Header/Branding */}
-        <div className="p-4 lg:p-6 border-b border-border flex items-center gap-3 shrink-0">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground shadow-sm">
-            <Clock className="w-5 h-5" />
-          </div>
-          <div>
-            <h1 className="font-bold text-lg tracking-tight leading-none text-foreground">Time Overlap</h1>
-            <p className="text-xs text-muted-foreground mt-1">Global team sync</p>
-          </div>
+    <div className="min-h-screen bg-[#F8FAFC] pb-24 relative overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute top-[20%] right-[-5%] w-[30%] h-[50%] bg-blue-400/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 relative z-10">
+
+        {/* Header */}
+        <div className="text-center max-w-2xl mx-auto mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center justify-center p-2.5 mb-6 rounded-2xl bg-white shadow-sm border border-slate-200 text-primary"
+          >
+            <Users className="w-6 h-6" />
+          </motion.div>
+          <motion.h1
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight mb-4"
+          >
+            Find the perfect time to{" "}
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-teal-400">
+              collaborate.
+            </span>
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-lg text-slate-500"
+          >
+            Compare up to 5 time zones side-by-side and instantly spot the
+            optimal working hours for your global team.
+          </motion.p>
         </div>
 
-        {/* People List */}
-        <div className="flex-1 overflow-y-auto custom-scrollbar p-4 lg:p-6 space-y-6">
-          <div>
-            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Your Timezone</h2>
+        {/* People cards */}
+        <div className="mb-16">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-bold text-slate-800">Team Locations</h2>
+            <Button
+              onClick={addColleague}
+              disabled={colleagues.length >= 5}
+              className="rounded-full shadow-md shadow-primary/20 hover:shadow-lg transition-all"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Add Colleague
+            </Button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <PersonCard
               isMe={true}
               person={me}
               onUpdate={(updates) => setMe(prev => ({ ...prev, ...updates }))}
             />
-          </div>
 
-          <div>
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Team ({colleagues.length}/7)</h2>
-              <Button
-                variant="ghost"
-                size="icon"
+            <AnimatePresence>
+              {colleagues.map((colleague) => (
+                <PersonCard
+                  key={colleague.id}
+                  isMe={false}
+                  person={colleague}
+                  onUpdate={(updates) => updateColleague(colleague.id, updates)}
+                  onRemove={() => removeColleague(colleague.id)}
+                />
+              ))}
+            </AnimatePresence>
+
+            {colleagues.length < 5 && (
+              <motion.button
+                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
                 onClick={addColleague}
-                disabled={colleagues.length >= 7}
-                className="h-6 w-6 text-muted-foreground hover:text-foreground hover:bg-muted rounded-full transition-colors"
-                title="Add Colleague"
+                className="flex flex-col items-center justify-center gap-3 p-6 rounded-2xl border-2 border-dashed border-slate-200 bg-slate-50/50 hover:bg-slate-50 hover:border-primary/30 text-slate-400 hover:text-primary transition-colors min-h-[160px]"
               >
-                <Plus className="w-4 h-4" />
-              </Button>
-            </div>
-            <div className="space-y-3">
-              <AnimatePresence initial={false}>
-                {colleagues.map((colleague) => (
-                  <PersonCard
-                    key={colleague.id}
-                    isMe={false}
-                    person={colleague}
-                    onUpdate={(updates) => updateColleague(colleague.id, updates)}
-                    onRemove={() => removeColleague(colleague.id)}
-                  />
-                ))}
-              </AnimatePresence>
-
-              {colleagues.length < 7 && (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                >
-                  <Button
-                    variant="outline"
-                    className="w-full justify-start text-muted-foreground border-dashed border-border hover:border-primary/50 hover:bg-primary/5 transition-colors h-10"
-                    onClick={addColleague}
-                  >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Add Colleague
-                  </Button>
-                </motion.div>
-              )}
-            </div>
+                <div className="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center mb-1">
+                  <Plus className="w-5 h-5" />
+                </div>
+                <span className="font-medium text-sm">Add another location</span>
+                <span className="text-xs text-slate-400">
+                  {5 - colleagues.length} slots remaining
+                </span>
+              </motion.button>
+            )}
           </div>
         </div>
-      </aside>
 
-      {/* Main Content Area - Table */}
-      <main className="flex-1 overflow-hidden relative bg-background/50 flex flex-col">
-        {/* Subtle decorative lights in dark mode */}
-        <div className="absolute top-[-20%] left-[20%] w-[40%] h-[40%] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[30%] h-[50%] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none" />
+        {/* Overlap table */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="relative"
+        >
+          <div className="absolute -top-4 -left-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl -z-10" />
+          <div className="absolute -bottom-4 -right-4 w-32 h-32 bg-blue-400/10 rounded-full blur-2xl -z-10" />
 
-        <div className="flex-1 overflow-auto custom-scrollbar p-0 lg:p-8 relative z-10">
-          <div className="h-full flex flex-col max-w-[1400px] mx-auto">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1, duration: 0.3 }}
-              className="flex-1 flex flex-col lg:rounded-2xl border-0 lg:border border-border shadow-2xl overflow-hidden bg-card"
-            >
-              <OverlapTable
-                people={[me, ...colleagues]}
-                baseTimezone={me.city?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone}
-              />
-            </motion.div>
-          </div>
-        </div>
-      </main>
+          <OverlapTable
+            people={[me, ...colleagues]}
+            baseTimezone={me.city?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone}
+          />
+        </motion.div>
+
+      </div>
     </div>
   )
 }
