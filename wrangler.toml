@@ -1,3 +1,5 @@
 name = "colleague-time-zone"
-pages_build_output_dir = "./artifacts/timezone-tool/dist/public"
 compatibility_date = "2026-07-14"
+
+[assets]
+directory = "./artifacts/timezone-tool/dist/public"
